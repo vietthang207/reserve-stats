@@ -29,6 +29,24 @@ github.com/ethereum/go-ethereum/common/prque
 github.com/ethereum/go-ethereum/ethdb
 github.com/ethereum/go-ethereum/metrics
 github.com/ethereum/go-ethereum/p2p/netutil
+github.com/ethereum/go-ethereum/ethclient
+github.com/ethereum/go-ethereum/common
+github.com/ethereum/go-ethereum
+github.com/ethereum/go-ethereum/common/hexutil
+github.com/ethereum/go-ethereum/core/types
+github.com/ethereum/go-ethereum/rlp
+github.com/ethereum/go-ethereum/rpc
+github.com/ethereum/go-ethereum/crypto/sha3
+github.com/ethereum/go-ethereum/crypto
+github.com/ethereum/go-ethereum/params
+github.com/ethereum/go-ethereum/trie
+github.com/ethereum/go-ethereum/log
+github.com/ethereum/go-ethereum/p2p/netutil
+github.com/ethereum/go-ethereum/common/math
+github.com/ethereum/go-ethereum/crypto/secp256k1
+github.com/ethereum/go-ethereum/common/prque
+github.com/ethereum/go-ethereum/ethdb
+github.com/ethereum/go-ethereum/metrics
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
@@ -80,3 +98,9 @@ golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/internal/fastwalk
 # gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 gopkg.in/natefinch/npipe.v2
+# golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3
+golang.org/x/net/websocket
+# gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
+gopkg.in/natefinch/npipe.v2
+# gopkg.in/urfave/cli.v1 v1.20.0
+gopkg.in/urfave/cli.v1
