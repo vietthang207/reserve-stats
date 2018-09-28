@@ -1,7 +1,10 @@
 package client
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"path"
 	"time"
 )
 
@@ -13,39 +16,57 @@ type Client struct {
 	c *http.Client
 }
 
-//func (sc *SettingClient) newRequest(method, url string, params map[string]string) (*http.Request, error) {
-//	req, err := http.NewRequest(method, url, nil)
-//	if err != nil {
-//		return nil, err
-//	}
-//	// Add header
-//	req.Header.Add("Accept", "application/json")
-//	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-//	// Create raw query
-//	q := req.URL.Query()
-//	for k, v := range params {
-//		q.Add(k, v)
-//	}
-//	req.URL.RawQuery = q.Encode()
-//	//sign
-//	nonce, ok := params["nonce"]
-//	if !ok {
-//		log.Printf("there was no nonce")
-//	} else {
-//		sc.sign(req, q.Encode(), nonce)
-//	}
-//
-//	return req, nil
-//}
-
 func (c *Client) newRequest(method, endpoint string, params map[string]string) (*http.Request, error) {
+	req, err := http.NewRequest(method, path.Join(c.url, endpoint), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
+	q := req.URL.Query()
+	for k, v := range params {
+		q.Add(k, v)
+	}
+	req.URL.RawQuery = q.Encode()
+	return req, nil
+}
+
+type allSettingsResponse struct {
+	Data allSettings `json:"data"`
+}
+
+type allSettings struct {
+	Tokens *response `json:"tokens"`
+}
+
+type response struct {
+	Tokens []Token `json:"tokens"`
 }
 
 func (c *Client) Tokens() ([]Token, error) {
 	const endpoint = "/setting/all-settings"
-	//req, err := http.NewRequest(http.MethodGet, nil)
-	return nil, nil
+	req, err := c.newRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp, err := c.c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected return code: %d", rsp.StatusCode)
+	}
+
+	var settingsResponse = &allSettingsResponse{}
+	if err = json.NewDecoder(rsp.Body).Decode(&settingsResponse); err != nil {
+		return nil, err
+	}
+
+	return settingsResponse.Data.Tokens.Tokens, nil
 }
 
 // NewClient creates a new core client instance.
