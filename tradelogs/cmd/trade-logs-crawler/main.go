@@ -101,10 +101,12 @@ func getTradeLogs(c *cli.Context) error {
 	}
 
 	tradeLogs, err := crawler.GetTradeLogs(fromBlock, toBlock)
-	if err == nil {
-		for _, logItem := range tradeLogs {
-			fmt.Printf("%+v\n", logItem)
-		}
+	if err != nil {
+		return err
+	}
+
+	for _, logItem := range tradeLogs {
+		fmt.Printf("%+v\n", logItem)
 	}
 
 	return nil
