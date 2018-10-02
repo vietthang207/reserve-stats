@@ -6,6 +6,7 @@ import (
 	"os"
 
 	libapp "github.com/KyberNetwork/reserve-stats/lib/app"
+	"github.com/KyberNetwork/reserve-stats/lib/core/client"
 	"github.com/KyberNetwork/reserve-stats/tokeninfo"
 	"github.com/urfave/cli"
 )
@@ -28,7 +29,7 @@ func main() {
 			Aliases: []string{"r"},
 			Usage:   "report which reserves provides which token",
 			Action:  reserve,
-			Flags: []cli.Flag{
+			Flags: append(client.NewCliFlags("TOKEN_INFO_"),
 				cli.StringFlag{
 					Name:  nodeURLFlag,
 					Usage: "Ethereum node provider URL",
@@ -39,7 +40,7 @@ func main() {
 					Usage: "output file location",
 					Value: "./output.json",
 				},
-			},
+			),
 		},
 	}
 
@@ -56,6 +57,18 @@ func reserve(c *cli.Context) error {
 	defer logger.Sync()
 
 	sugar := logger.Sugar()
+
+	coreClient, err := client.NewClientFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	tokens, err := coreClient.Tokens()
+	if err != nil {
+		return err
+	}
+
+	log.Println(tokens)
 
 	f, err := tokeninfo.NewReserveCrawler(
 		sugar,

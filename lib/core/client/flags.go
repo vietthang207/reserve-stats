@@ -1,10 +1,16 @@
 package client
 
-import "github.com/urfave/cli"
+import (
+	"fmt"
+	"github.com/urfave/cli"
+
+	"github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+)
 
 const (
-	coreURLFlag    = "core-url"
-	coreSigningKey = "core-signing-key"
+	coreURLFlag        = "core-url"
+	coreSigningKeyFlag = "core-signing-key"
 )
 
 // NewCliFlags returns cli flags to configure a core client.
@@ -16,14 +22,31 @@ func NewCliFlags(prefix string) ([]cli.Flag) {
 			EnvVar: prefix + "CORE_URL",
 		},
 		cli.StringFlag{
-			Name:   coreSigningKey,
+			Name:   coreSigningKeyFlag,
 			Usage:  "Core API URL",
 			EnvVar: prefix + "CORE_SIGNING_KEY",
 		},
 	}
 }
 
-// ValidateCliFlags validates core input flags.
-func ValidateCliFlags(c *cli.Context) error {
+// NewClientFromContext returns new core client from cli flags.
+func NewClientFromContext(c *cli.Context) (*Client, error) {
+	coreURL := c.String(coreURLFlag)
+	err := validation.Validate(coreURL,
+		validation.Required,
+		is.URL,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("core url: %s", err.Error())
+	}
 
+	coreSigningKey := c.String(coreSigningKeyFlag)
+	err = validation.Validate(coreSigningKeyFlag,
+		validation.Required,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("core signing key: %s", err.Error())
+	}
+
+	return NewClient(coreURL, coreSigningKey)
 }
