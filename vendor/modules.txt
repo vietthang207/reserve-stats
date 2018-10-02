@@ -35,6 +35,10 @@ github.com/go-stack/stack
 github.com/golang/snappy
 # github.com/google/uuid v1.0.0
 github.com/google/uuid
+# github.com/influxdata/influxdb v1.6.3
+github.com/influxdata/influxdb/client/v2
+github.com/influxdata/influxdb/models
+github.com/influxdata/influxdb/pkg/escape
 # github.com/pborman/uuid v1.2.0
 github.com/pborman/uuid
 # github.com/rjeczalik/notify v0.9.2
