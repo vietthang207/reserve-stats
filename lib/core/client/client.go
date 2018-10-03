@@ -75,8 +75,6 @@ func (c *Client) newRequest(method, endpoint string, params map[string]string) (
 		}
 		req.Header.Add("nonce", nonce)
 		req.Header.Add("signed", signed)
-		println("__DEBUG_ME")
-		println(signed)
 	}
 
 	return req, nil
