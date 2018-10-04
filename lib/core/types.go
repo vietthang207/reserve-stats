@@ -1,4 +1,4 @@
-package client
+package core
 
 // Token is a ERC20 token allowed to trade in core.
 type Token struct {

@@ -1,8 +1,9 @@
-package client
+package core
 
 import (
 	"fmt"
 	"github.com/urfave/cli"
+	"go.uber.org/zap"
 
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -30,7 +31,7 @@ func NewCliFlags(prefix string) ([]cli.Flag) {
 }
 
 // NewClientFromContext returns new core client from cli flags.
-func NewClientFromContext(c *cli.Context) (*Client, error) {
+func NewClientFromContext(sugar *zap.SugaredLogger, c *cli.Context) (*Client, error) {
 	coreURL := c.String(coreURLFlag)
 	err := validation.Validate(coreURL,
 		validation.Required,
@@ -48,5 +49,5 @@ func NewClientFromContext(c *cli.Context) (*Client, error) {
 		return nil, fmt.Errorf("core signing key: %s", err.Error())
 	}
 
-	return NewClient(coreURL, coreSigningKey)
+	return NewClient(sugar, coreURL, coreSigningKey)
 }

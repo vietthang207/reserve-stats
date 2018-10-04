@@ -1,10 +1,11 @@
-package client
+package core
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type allSettingsResponse struct {
@@ -18,6 +19,13 @@ type tokensData struct {
 
 type tokenList struct {
 	Tokens []Token `json:"tokens"`
+}
+
+// generateNonce returns nonce header required to use Core API,
+// which is current timestamp in milliseconds.
+func generateNonce() string {
+	now := time.Now().UnixNano() / int64(time.Millisecond)
+	return strconv.FormatInt(now, 10)
 }
 
 // Tokens returns all configured tokens.
@@ -49,10 +57,11 @@ type tokenList struct {
 //  }
 //}
 func (c *Client) Tokens() ([]Token, error) {
-	const endpoint = "setting/all-settings"
+	const endpoint = "/setting/all-settings"
 	var params = make(map[string]string)
-	nonce := strconv.FormatUint(GetTimepoint(), 10)
-	params["nonce"] = nonce
+
+	params["nonce"] = generateNonce()
+
 	req, err := c.newRequest(http.MethodGet, endpoint, params)
 	if err != nil {
 		return nil, err

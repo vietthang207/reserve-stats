@@ -1,9 +1,9 @@
-package client
+package core
 
 import (
 	"crypto/hmac"
 	"crypto/sha512"
-	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"sort"
 	"time"
@@ -13,10 +13,10 @@ import (
 
 // Client is the the real implementation of core client interface.
 type Client struct {
+	sugar      *zap.SugaredLogger
+	client     *http.Client
 	url        string
 	signingKey string
-
-	client *http.Client
 }
 
 type commonResponse struct {
@@ -24,7 +24,7 @@ type commonResponse struct {
 	Success bool   `json:"success"`
 }
 
-// SortByKey sort all the params by key in string order
+// sortByKey sort all the params by key in string order
 // This is required for the request to be signed correctly
 func sortByKey(params map[string]string) map[string]string {
 	newParams := make(map[string]string, len(params))
@@ -47,13 +47,15 @@ func (c *Client) sign(msg string) (string, error) {
 	return common.Bytes2Hex(mac.Sum(nil)), nil
 }
 
-func GetTimepoint() uint64 {
-	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
-	return uint64(timestamp)
-}
-
 func (c *Client) newRequest(method, endpoint string, params map[string]string) (*http.Request, error) {
-	req, err := http.NewRequest(method, fmt.Sprintf("%s/%s", c.url, endpoint), nil)
+	logger := c.sugar.With(
+		"method", method,
+		"endpoint", endpoint,
+	)
+
+	logger.Debug("creating new Core API HTTP request")
+
+	req, err := http.NewRequest(method, c.url+endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -66,25 +68,26 @@ func (c *Client) newRequest(method, endpoint string, params map[string]string) (
 		q.Add(k, v)
 	}
 	req.URL.RawQuery = q.Encode()
+	logger = logger.With("raw_query", req.URL.RawQuery)
 
-	nonce, ok := params["nonce"]
+	_, ok := params["nonce"]
 	if ok {
+		logger.Debug("nonce is available, signing message")
 		signed, err := c.sign(q.Encode())
 		if err != nil {
 			return nil, err
 		}
-		req.Header.Add("nonce", nonce)
 		req.Header.Add("signed", signed)
+		logger = logger.With("signed", signed)
 	}
 
+	logger.Debug("Core API HTTP request created")
 	return req, nil
 }
 
 // NewClient creates a new core client instance.
-func NewClient(url, signingKey string) (*Client, error) {
+func NewClient(sugar *zap.SugaredLogger, url, signingKey string) (*Client, error) {
 	const timeout = time.Minute
-	c := &http.Client{
-		Timeout: timeout,
-	}
-	return &Client{url: url, signingKey: signingKey, client: c}, nil
+	client := &http.Client{Timeout: timeout}
+	return &Client{sugar: sugar, url: url, signingKey: signingKey, client: client}, nil
 }
