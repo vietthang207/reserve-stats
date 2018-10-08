@@ -56,6 +56,8 @@ golang.org/x/tools v0.0.0-20180926203008-ef4a2a23bb35 h1:1j+JOCsLri5Rws1a90OLKwu
 golang.org/x/tools v0.0.0-20180926203008-ef4a2a23bb35/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20180927190235-1be7b45b4c83 h1:skyv89jIlM8KUX3a7p9HTDbyK7nv+Sm+rAhvw8jw3OM=
 golang.org/x/tools v0.0.0-20180927190235-1be7b45b4c83/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+golang.org/x/tools v0.0.0-20181006002542-f60d9635b16a h1:2clmXmw4YommCu+v1MdCr87N191PLYU6hJ0m74ZFiCo=
+golang.org/x/tools v0.0.0-20181006002542-f60d9635b16a/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33q108Sa+fhmuc+sWQYwY=
 gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce h1:+JknDZhAj8YMt7GC73Ei8pv4MzjDUNPHgQWJdtMAaDU=
 gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce h1:+JknDZhAj8YMt7GC73Ei8pv4MzjDUNPHgQWJdtMAaDU=

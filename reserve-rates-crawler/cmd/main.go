@@ -6,6 +6,7 @@ import (
 
 	kyberApp "github.com/KyberNetwork/reserve-stats/lib/app"
 	"github.com/KyberNetwork/reserve-stats/reserve-rates-crawler/crawler"
+	"github.com/KyberNetwork/reserve-stats/reserve-rates-crawler/storage/influx"
 	"github.com/KyberNetwork/reserve-stats/setting"
 	cli "github.com/urfave/cli"
 	"go.uber.org/zap"
@@ -15,13 +16,23 @@ const (
 	addressesFlag = "addresses"
 	blockFlag     = "block"
 	coreFlag      = "coreURL"
+	dbURLFlag     = "dbURL"
+	dbUNameFlag   = "dbUname"
+	dbPwdFlag     = "dbPwd"
 )
+
+func newRateStorage(c *cli.Context) (*influx.InfluxRateStorage, error) {
+	url := c.GlobalString(dbURLFlag)
+	uname := c.GlobalString(dbUNameFlag)
+	pwd := c.GlobalString(dbPwdFlag)
+	return influx.NewRateInfluxDBStorage(url, uname, pwd)
+}
 
 func newReserveCrawlerCli() *cli.App {
 	app := kyberApp.NewApp()
 	app.Name = "reserve-rates-crawler"
 	app.Usage = "get the rates of all configured reserves at a certain block"
-	var block uint64
+	var block int64
 	var coreURL string
 	app.Flags = append(app.Flags,
 		cli.StringSliceFlag{
@@ -29,7 +40,7 @@ func newReserveCrawlerCli() *cli.App {
 			EnvVar: "RESERVE_ADDRESSES",
 			Usage:  "list of reserve contract addresses. Example: --addresses={\"0x1111\",\"0x222\"}",
 		},
-		cli.Uint64Flag{
+		cli.Int64Flag{
 			Name:        blockFlag,
 			Value:       0,
 			Usage:       "block from which rate is queried. Default value is 0, in which case the latest rate is returned",
@@ -41,6 +52,22 @@ func newReserveCrawlerCli() *cli.App {
 			EnvVar:      "CORE_URL",
 		},
 		kyberApp.NewEthereumNodeFlags(""),
+		cli.StringFlag{
+			Name:  dbURLFlag,
+			Value: "http://localhost:8086/",
+			Usage: "url to InfluxDB server",
+		},
+		cli.StringFlag{
+			Name:   dbUNameFlag,
+			Usage:  "userName for InfluxDB server",
+			EnvVar: "INFLUX_UNAME",
+			Value:  "",
+		}, cli.StringFlag{
+			Name:   dbPwdFlag,
+			Usage:  "url to InfluxDB server",
+			EnvVar: "INFLUX_PWD",
+			Value:  "",
+		},
 	)
 	app.Action = func(c *cli.Context) error {
 		addrs := c.StringSlice(addressesFlag)
@@ -56,7 +83,11 @@ func newReserveCrawlerCli() *cli.App {
 		if err != nil {
 			return err
 		}
-		reserveRateCrawler, err := crawler.NewReserveRatesCrawler(addrs, client, sett, logger.Sugar())
+		rateStorage, err := newRateStorage(c)
+		if err != nil {
+			return err
+		}
+		reserveRateCrawler, err := crawler.NewReserveRatesCrawler(addrs, client, sett, logger.Sugar(), rateStorage)
 		if err != nil {
 			return err
 		}

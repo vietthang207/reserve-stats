@@ -6,9 +6,9 @@ import (
 )
 
 // GetTimepoint return current Unix Timestamp in millisecond with uint64 format
-func GetTimepoint() uint64 {
+func GetTimepoint() int64 {
 	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
-	return uint64(timestamp)
+	return int64(timestamp)
 }
 
 // BigToFloat converts a big int to float according to its number of decimal digits
@@ -24,4 +24,9 @@ func BigToFloat(b *big.Int, decimal int64) float64 {
 	res := new(big.Float).Quo(f, power)
 	result, _ := res.Float64()
 	return result
+}
+
+// TimepointMillisecToTime convert a timepoint in s to time.Time object
+func TimepointMillisecToTime(t int64) time.Time {
+	return time.Unix(0, int64(t)*int64(time.Millisecond))
 }

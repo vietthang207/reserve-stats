@@ -8,7 +8,7 @@ type Token struct {
 	Decimals             int64  `json:"decimals"`
 	Active               bool   `json:"active"`
 	Internal             bool   `json:"internal"`
-	LastActivationChange uint64 `json:"last_activation_change"`
+	LastActivationChange int64  `json:"last_activation_change"`
 }
 
 // ReserveTokenRateEntry is a  map[ETH-tokenID]ratesEntry
@@ -24,15 +24,14 @@ type ReserveRateEntry struct {
 
 // ReserveRates hold all the pairs's rate for a particular reserve and metadata
 type ReserveRates struct {
-	Timestamp     uint64
-	ReturnTime    uint64
-	BlockNumber   uint64
-	ToBlockNumber uint64
-	Data          ReserveTokenRateEntry
+	Timestamp   int64
+	ReturnTime  int64
+	BlockNumber int64
+	Data        ReserveTokenRateEntry
 }
 
 // NewToken creates a new Token.
-func NewToken(id, name, address string, decimal int64, active, internal bool, timepoint uint64) Token {
+func NewToken(id, name, address string, decimal int64, active, internal bool, timepoint int64) Token {
 	return Token{
 		ID:                   id,
 		Name:                 name,

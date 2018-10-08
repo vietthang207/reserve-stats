@@ -6,6 +6,7 @@ import (
 
 	"github.com/KyberNetwork/reserve-stats/common"
 	"github.com/KyberNetwork/reserve-stats/lib/contracts"
+	"github.com/KyberNetwork/reserve-stats/reserve-rates-crawler/storage"
 	ethereum "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"go.uber.org/zap"
@@ -18,10 +19,11 @@ type ResreveRatesCrawler struct {
 	Addresses       []ethereum.Address
 	setting         Setting
 	logger          *zap.SugaredLogger
+	db              storage.ReserveRatesStorage
 }
 
 // NewReserveRatesCrawler returns an instant of ReserveRatesCrawler.
-func NewReserveRatesCrawler(addrs []string, client *ethclient.Client, sett Setting, lger *zap.SugaredLogger) (*ResreveRatesCrawler, error) {
+func NewReserveRatesCrawler(addrs []string, client *ethclient.Client, sett Setting, lger *zap.SugaredLogger, dbInstance storage.ReserveRatesStorage) (*ResreveRatesCrawler, error) {
 	wrpContract, err := contracts.NewVersionedWrapper(client)
 	if err != nil {
 		return nil, err
@@ -35,6 +37,7 @@ func NewReserveRatesCrawler(addrs []string, client *ethclient.Client, sett Setti
 		Addresses:       ethAddrs,
 		setting:         sett,
 		logger:          lger,
+		db:              dbInstance,
 	}, nil
 }
 
@@ -42,7 +45,7 @@ func (rrc *ResreveRatesCrawler) getSupportedTokens(rsvAddr ethereum.Address) ([]
 	return rrc.setting.GetInternalTokens()
 }
 
-func (rrc *ResreveRatesCrawler) getEachReserveRate(block uint64, rsvAddr ethereum.Address, data *sync.Map, wg *sync.WaitGroup) error {
+func (rrc *ResreveRatesCrawler) getEachReserveRate(block int64, rsvAddr ethereum.Address, data *sync.Map, wg *sync.WaitGroup) error {
 	defer wg.Done()
 	tokens, err := rrc.getSupportedTokens(rsvAddr)
 	if err != nil {
@@ -63,8 +66,7 @@ func (rrc *ResreveRatesCrawler) getEachReserveRate(block uint64, rsvAddr ethereu
 	rates := common.ReserveRates{}
 	rsvTokenRateEntry := common.ReserveTokenRateEntry{}
 	rates.Timestamp = common.GetTimepoint()
-	rates.BlockNumber = block - 1
-	rates.ToBlockNumber = block
+	rates.BlockNumber = block
 	rates.ReturnTime = common.GetTimepoint()
 	for index, token := range tokens {
 		rateEntry := common.ReserveRateEntry{}
@@ -81,7 +83,7 @@ func (rrc *ResreveRatesCrawler) getEachReserveRate(block uint64, rsvAddr ethereu
 
 // GetReserveRates returns the map[ReserveAddress]ReserveRates at the given block number.
 // It will only return rates from the set of addresses within its definition.
-func (rrc *ResreveRatesCrawler) GetReserveRates(block uint64) (map[string]common.ReserveRates, error) {
+func (rrc *ResreveRatesCrawler) GetReserveRates(block int64) (map[string]common.ReserveRates, error) {
 	result := make(map[string]common.ReserveRates)
 	data := sync.Map{}
 	wg := sync.WaitGroup{}
@@ -117,5 +119,14 @@ func (rrc *ResreveRatesCrawler) GetReserveRates(block uint64) (map[string]common
 		result[reserveAddr.Hex()] = rates
 		return true
 	})
-	return result, cErr
+	if cErr != nil {
+		return result, cErr
+	}
+	uErr := rrc.db.UpdateRatesRecords(result)
+	return result, uErr
+}
+
+//QueryReserveRates return a list of reserve rate in a specific period of time
+func (rrc *ResreveRatesCrawler) QueryReserveRates(rsvAddr ethereum.Address, fromTime, toTime int64) ([]common.ReserveRates, error) {
+	return rrc.db.GetRatesByTimePoint(rsvAddr, fromTime, toTime)
 }

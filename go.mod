@@ -8,7 +8,7 @@ require (
 	github.com/ethereum/go-ethereum v1.8.16
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
-	github.com/influxdata/influxdb v1.6.3 // indirect
+	github.com/influxdata/influxdb v1.6.3
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/rs/cors v1.5.0 // indirect
@@ -19,7 +19,7 @@ require (
 	go.uber.org/zap v1.9.1
 	golang.org/x/crypto v0.0.0-20180927165925-5295e8364332 // indirect
 	golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3 // indirect
-	golang.org/x/tools v0.0.0-20180927190235-1be7b45b4c83 // indirect
+	golang.org/x/tools v0.0.0-20181006002542-f60d9635b16a // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
 )
