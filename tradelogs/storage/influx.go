@@ -15,6 +15,11 @@ import (
 	"github.com/KyberNetwork/reserve-stats/tradelogs/common"
 )
 
+const (
+	//timePrecision is the precision configured for influxDB
+	timePrecision = "ms"
+)
+
 // InfluxStorage represent a client to store trade data to influx DB
 type InfluxStorage struct {
 	dbName       string
@@ -42,7 +47,7 @@ func NewInfluxStorage(sugar *zap.SugaredLogger, dbName string, influxClient clie
 func (is *InfluxStorage) SaveTradeLogs(logs []common.TradeLog, rates []tokenrate.ETHUSDRate) error {
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
 		Database:  is.dbName,
-		Precision: "ms",
+		Precision: timePrecision,
 	})
 	if err != nil {
 		return err
