@@ -41,4 +41,7 @@ type TradeLog struct {
 
 	IP      string `json:"ip"`
 	Country string `json:"country"`
+
+	ETHUSDRate     float64 `json:"-"`
+	ETHUSDProvider string  `json:"-"`
 }
