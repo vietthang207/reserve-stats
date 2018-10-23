@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/KyberNetwork/reserve-stats/lib/core"
 	"github.com/KyberNetwork/reserve-stats/lib/httputil"
 	"github.com/KyberNetwork/reserve-stats/lib/tokenrate"
 	"github.com/KyberNetwork/reserve-stats/tradelogs/common"
@@ -24,6 +25,10 @@ func (s *mockStorage) SaveTradeLogs(logs []common.TradeLog, rates []tokenrate.ET
 }
 
 func (s *mockStorage) LoadTradeLogs(from, to time.Time) ([]common.TradeLog, error) {
+	return nil, nil
+}
+
+func (s *mockStorage) GetAssetVolume(token core.Token, fromTime, toTime uint64, frequency string) (map[time.Time]common.VolumeStats, error) {
 	return nil, nil
 }
 
