@@ -2,9 +2,10 @@ package http
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"net/http"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 
@@ -71,6 +72,7 @@ func (ha *Server) getTradeLogs(c *gin.Context) {
 func (ha *Server) setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/trade-logs", ha.getTradeLogs)
+	r.GET("/wallet-fee", ha.getWalletFee)
 	return r
 }
 
