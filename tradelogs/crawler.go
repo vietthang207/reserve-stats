@@ -41,14 +41,14 @@ const (
 	internalNetworkAddr = "0x91a502C678605fbCe581eae053319747482276b9"
 )
 
-// NewTradeLogCrawler create a new TradeLogCrawler instance.
-func NewTradeLogCrawler(sugar *zap.SugaredLogger, client *ethclient.Client, broadcastClient broadcast.Interface, storage storage.Interface, rateProvider tokenrate.ETHUSDRateProvider) (*TradeLogCrawler, error) {
+// NewCrawler create a new Crawler instance.
+func NewCrawler(sugar *zap.SugaredLogger, client *ethclient.Client, broadcastClient broadcast.Interface, storage storage.Interface, rateProvider tokenrate.ETHUSDRateProvider) (*Crawler, error) {
 	resolver, err := blockchain.NewBlockTimeResolver(sugar, client)
 	if err != nil {
 		return nil, err
 	}
 
-	return &TradeLogCrawler{
+	return &Crawler{
 		sugar:           sugar,
 		ethClient:       client,
 		txTime:          resolver,
@@ -58,10 +58,9 @@ func NewTradeLogCrawler(sugar *zap.SugaredLogger, client *ethclient.Client, broa
 	}, nil
 }
 
-// TODO: rename this to Crawler only
-// TradeLogCrawler gets trade logs on KyberNetwork on blockchain, adding the
+// Crawler gets trade logs on KyberNetwork on blockchain, adding the
 // information about USD equivalent on each trade.
-type TradeLogCrawler struct {
+type Crawler struct {
 	sugar           *zap.SugaredLogger
 	ethClient       *ethclient.Client
 	txTime          *blockchain.BlockTimeResolver
@@ -204,7 +203,7 @@ func updateTradeLogs(allLogs []common.TradeLog, logItem types.Log, ts time.Time)
 }
 
 // GetTradeLogs returns trade logs from KyberNetwork.
-func (crawler *TradeLogCrawler) GetTradeLogs(fromBlock, toBlock *big.Int, timeout time.Duration) ([]common.TradeLog, error) {
+func (crawler *Crawler) GetTradeLogs(fromBlock, toBlock *big.Int, timeout time.Duration) ([]common.TradeLog, error) {
 	var (
 		result []common.TradeLog
 	)
