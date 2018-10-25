@@ -73,6 +73,7 @@ func (sv *Server) setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/trade-logs", sv.getTradeLogs)
 	r.GET("/asset-volume", sv.getAssetVolume)
+	r.GET("/reserve-volume", sv.getReserveVolume)
 	return r
 }
 
