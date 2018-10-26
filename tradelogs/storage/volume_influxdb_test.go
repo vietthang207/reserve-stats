@@ -156,7 +156,7 @@ func TestGetReserveVolume(t *testing.T) {
 	}
 
 	volume, err := is.GetReserveVolume(ethereum.HexToAddress(rsvAddrStr), core.ETHToken, fromTime, toTime, freq)
-	log.Printf("%v", volume)
+	t.Logf("Voume result %v", volume)
 	if err != nil {
 		t.Fatal(err)
 	}

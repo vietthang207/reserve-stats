@@ -14,5 +14,5 @@ type Interface interface {
 	SaveTradeLogs(logs []common.TradeLog, rates []tokenrate.ETHUSDRate) error
 	LoadTradeLogs(from, to time.Time) ([]common.TradeLog, error)
 	GetAssetVolume(token core.Token, fromTime, toTime uint64, frequency string) (map[time.Time]*common.VolumeStats, error)
-	GetReserveVolume(rsvAddr ethereum.Address, token core.Token, fromTime, toTime uint64, frequency string) (map[time.Time]common.VolumeStats, error)
+	GetReserveVolume(rsvAddr ethereum.Address, token core.Token, fromTime, toTime uint64, frequency string) (map[time.Time]*common.VolumeStats, error)
 }
