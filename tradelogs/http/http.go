@@ -6,19 +6,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
+	"github.com/KyberNetwork/reserve-stats/lib/core"
 	"github.com/KyberNetwork/reserve-stats/tradelogs/storage"
+	"github.com/gin-gonic/gin"
 )
 
 const limitedTimeRange = 24 * time.Hour
 
 // Server serve trade logs through http endpoint
 type Server struct {
-	storage storage.Interface
-	host    string
-	sugar   *zap.SugaredLogger
-	setting coreSetting
+	storage     storage.Interface
+	host        string
+	sugar       *zap.SugaredLogger
+	coreSetting core.Interface
 }
 
 type tradeLogsQuery struct {
@@ -83,6 +83,6 @@ func (sv *Server) Start() error {
 }
 
 // NewServer returns an instance of HttpApi to serve trade logs
-func NewServer(storage storage.Interface, host string, sugar *zap.SugaredLogger, sett coreSetting) *Server {
-	return &Server{storage: storage, host: host, sugar: sugar, setting: sett}
+func NewServer(storage storage.Interface, host string, sugar *zap.SugaredLogger, sett core.Interface) *Server {
+	return &Server{storage: storage, host: host, sugar: sugar, coreSetting: sett}
 }

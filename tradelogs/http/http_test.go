@@ -28,7 +28,7 @@ func (s *mockStorage) LoadTradeLogs(from, to time.Time) ([]common.TradeLog, erro
 	return nil, nil
 }
 
-func (s *mockStorage) GetAssetVolume(token core.Token, fromTime, toTime uint64, frequency string) (map[time.Time]common.VolumeStats, error) {
+func (s *mockStorage) GetAssetVolume(token core.Token, fromTime, toTime uint64, frequency string) (map[time.Time]*common.VolumeStats, error) {
 	return nil, nil
 }
 
