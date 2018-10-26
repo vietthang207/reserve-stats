@@ -11,7 +11,7 @@ const cqTemplate = `CREATE CONTINUOUS QUERY "{{.Name}}" on "{{.Database}}" ` +
 	`BEGIN {{.Query}}` +
 	`{{if not .GroupByQuery}} GROUP BY {{else}}, {{end}}time({{.TimeInterval}}{{if .OffsetInterval}},{{.OffsetInterval}}{{end}}) END`
 
-// ContinuousQuery represents an InfluxDB continous Query.
+// ContinuousQuery represents an InfluxDB Continuous Query.
 // By design ContinuousQuery doesn't try to be smart, it does not attempt to parse/validate any field,
 // just act as a templating engine.
 //
@@ -31,9 +31,11 @@ type ContinuousQuery struct {
 	Query           string
 	TimeInterval    string
 	OffsetIntervals []string
+
+	queries []string
 }
 
-func (cq *ContinuousQuery) Queries() ([]string, error) {
+func (cq *ContinuousQuery) prepareQueries() ([]string, error) {
 	var queries []string
 
 	if len(cq.OffsetIntervals) == 0 {
@@ -43,7 +45,7 @@ func (cq *ContinuousQuery) Queries() ([]string, error) {
 	for _, offsetInterval := range cq.OffsetIntervals {
 		var query bytes.Buffer
 
-		tmpl, err := template.New("cq.Queries").Parse(cqTemplate)
+		tmpl, err := template.New("cq.prepareQueries").Parse(cqTemplate)
 		if err != nil {
 			return nil, err
 		}
@@ -67,11 +69,11 @@ func (cq *ContinuousQuery) Queries() ([]string, error) {
 	return queries, nil
 }
 
-// NewContinuousQuery creates new ContinousQuery instance.
+// NewContinuousQuery creates new ContinuousQuery instance.
 func NewContinuousQuery(
 	name, database, resampleEveryInterval, resampleForInterval, query,
-	timeInterval string, offsetIntervals []string) *ContinuousQuery {
-	return &ContinuousQuery{
+	timeInterval string, offsetIntervals []string) (*ContinuousQuery, error) {
+	cq := &ContinuousQuery{
 		Name:                  name,
 		Database:              database,
 		ResampleEveryInterval: resampleEveryInterval,
@@ -80,4 +82,11 @@ func NewContinuousQuery(
 		TimeInterval:          timeInterval,
 		OffsetIntervals:       offsetIntervals,
 	}
+	queries, err := cq.prepareQueries()
+	if err != nil {
+		return nil, err
+	}
+	cq.queries = queries
+
+	return cq, nil
 }

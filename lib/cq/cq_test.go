@@ -9,99 +9,85 @@ import (
 
 func TestQueries(t *testing.T) {
 	var tests = []struct {
-		name    string
-		cq      *ContinuousQuery
-		queries []string
+		testName              string
+		name                  string
+		database              string
+		resampleEveryInterval string
+		resampleForInterval   string
+		query                 string
+		timeInterval          string
+		offsetIntervals       []string
+		queries               []string
 	}{
 		{
-			name: "simple continous query",
-			cq: NewContinuousQuery(
-				"test_cq",                      // Name
-				"test_db",                      // Database
-				"",                             // ResampleEveryInterval
-				"",                             // ResampleForInterval
-				`SELECT * FROM super_database`, // Query
-				"1h",                           // TimeInterval
-				nil,                            // OffsetIntervals
-			),
-			queries: []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
+			testName:              "simple continuous query",
+			name:                  "test_cq",
+			database:              "test_db",
+			resampleEveryInterval: "",
+			resampleForInterval:   "",
+			query:                 `SELECT * FROM super_database`,
+			timeInterval:          "1h",
+			offsetIntervals:       nil,
+			queries:               []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
 		},
 		{
-			name: "continous query with resample every interval",
-			cq: NewContinuousQuery(
-				"test_cq",                      // Name
-				"test_db",                      // Database
-				"2h",                           // ResampleEveryInterval
-				"",                             // ResampleForInterval
-				`SELECT * FROM super_database`, // Query
-				"1h",                           // TimeInterval
-				nil,                            // OffsetIntervals
-			),
-			queries: []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 2h BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
+			testName:              "continuous query with resample every interval",
+			name:                  "test_cq",
+			database:              "test_db",
+			resampleEveryInterval: "2h",
+			query:                 `SELECT * FROM super_database`,
+			timeInterval:          "1h",
+			queries:               []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 2h BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
 		},
 		{
-			name: "continous query with resample for interval",
-			cq: NewContinuousQuery(
-				"test_cq",                      // Name
-				"test_db",                      // Database
-				"",                             // ResampleEveryInterval
-				"2h",                           // ResampleForInterval
-				`SELECT * FROM super_database`, // Query
-				"1h",                           // TimeInterval
-				nil,                            // OffsetIntervals
-			),
-			queries: []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE FOR 2h BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
+			testName:            "continuous query with resample for interval",
+			name:                "test_cq",
+			database:            "test_db",
+			resampleForInterval: "2h",
+			query:               `SELECT * FROM super_database`,
+			timeInterval:        "1h",
+			queries:             []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE FOR 2h BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
 		},
 		{
-			name: "continous query with both resample every and for intervals",
-			cq: NewContinuousQuery(
-				"test_cq",                      // Name
-				"test_db",                      // Database
-				"1h",                           // ResampleEveryInterval
-				"2h",                           // ResampleForInterval
-				`SELECT * FROM super_database`, // Query
-				"1h",                           // TimeInterval
-				nil,                            // OffsetIntervals
-			),
-			queries: []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
+			testName:              "continuous query with both resample every and for intervals",
+			name:                  "test_cq",
+			database:              "test_db",
+			resampleEveryInterval: "1h",
+			resampleForInterval:   "2h",
+			query:                 `SELECT * FROM super_database`,
+			timeInterval:          "1h",
+			queries:               []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY time(1h) END`},
 		},
 		{
-			name: "continous query with group by in query clause",
-			cq: NewContinuousQuery(
-				"test_cq", // Name
-				"test_db", // Database
-				"1h",      // ResampleEveryInterval
-				"2h",      // ResampleForInterval
-				`SELECT * FROM super_database GROUP BY "email"`, // Query
-				"1h", // TimeInterval
-				nil,  // OffsetIntervals
-			),
-			queries: []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY "email", time(1h) END`},
+			testName:              "continuous query with group by in query clause",
+			name:                  "test_cq",
+			database:              "test_db",
+			resampleEveryInterval: "1h",
+			resampleForInterval:   "2h",
+			query:                 `SELECT * FROM super_database GROUP BY "email"`,
+			timeInterval:          "1h",
+			queries:               []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY "email", time(1h) END`},
 		},
 		{
-			name: "continous query with one offset interval",
-			cq: NewContinuousQuery(
-				"test_cq", // Name
-				"test_db", // Database
-				"1h",      // ResampleEveryInterval
-				"2h",      // ResampleForInterval
-				`SELECT * FROM super_database GROUP BY "email"`, // Query
-				"1h",            // TimeInterval
-				[]string{"30m"}, // OffsetIntervals
-			),
-			queries: []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY "email", time(1h,30m) END`},
+			testName:              "continuous query with one offset interval",
+			name:                  "test_cq",
+			database:              "test_db",
+			resampleEveryInterval: "1h",
+			resampleForInterval:   "2h",
+			query:                 `SELECT * FROM super_database GROUP BY "email"`,
+			timeInterval:          "1h",
+			offsetIntervals:       []string{"30m"},
+			queries:               []string{`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY "email", time(1h,30m) END`},
 		},
 		{
-			name: "continous query with multiple offset intervals",
-			cq: NewContinuousQuery(
-				"test_cq", // Name
-				"test_db", // Database
-				"1h",      // ResampleEveryInterval
-				"2h",      // ResampleForInterval
-				`SELECT * FROM super_database GROUP BY "email"`, // Query
-				"1h",                   // TimeInterval
-				[]string{"10m", "20m"}, // OffsetIntervals
-			),
+			testName:              "continuous query with multiple offset intervals",
+			name:                  "test_cq",
+			database:              "test_db",
+			resampleEveryInterval: "1h",
+			resampleForInterval:   "2h",
+			query:                 `SELECT * FROM super_database GROUP BY "email"`,
+			timeInterval:          "1h",
+			offsetIntervals:       []string{"10m", "20m"},
 			queries: []string{
 				`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY "email", time(1h,10m) END`,
 				`CREATE CONTINUOUS QUERY "test_cq" on "test_db" RESAMPLE EVERY 1h FOR 2h BEGIN SELECT * FROM super_database GROUP BY "email", time(1h,20m) END`,
@@ -110,8 +96,16 @@ func TestQueries(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		queries, err := tc.cq.Queries()
-		require.NoError(t, err, tc.name)
-		assert.Equal(t, queries, tc.queries, tc.name)
+		cq, err := NewContinuousQuery(
+			tc.name,
+			tc.database,
+			tc.resampleEveryInterval,
+			tc.resampleForInterval,
+			tc.query,
+			tc.timeInterval,
+			tc.offsetIntervals,
+		)
+		require.NoError(t, err, tc.testName)
+		assert.Equal(t, cq.queries, tc.queries, tc.testName)
 	}
 }
