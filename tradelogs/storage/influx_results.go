@@ -114,6 +114,15 @@ func (is *InfluxStorage) rowToWalletFee(row []interface{}) (ethereum.Hash, commo
 	return txHash, walletFee, nil
 }
 
+func (is *InfluxStorage) rowToCountryStats(row []interface{}) (time.Time, common.CountryStats, error) {
+	var (
+		ts           time.Time
+		countryStats common.CountryStats
+		err          error
+	)
+	return ts, countryStats, err
+}
+
 // rowToTradeLog converts the result of InfluxDB query from to TradeLog event.
 // The query is:
 // SELECT time, block_number, tx_hash,
