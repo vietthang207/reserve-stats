@@ -15,5 +15,5 @@ type Interface interface {
 	LoadTradeLogs(from, to time.Time) ([]common.TradeLog, error)
 	GetAggregatedBurnFee(from, to time.Time, freq string, reserveAddrs []ethereum.Address) (map[ethereum.Address]map[string]float64, error)
 	GetAssetVolume(token core.Token, fromTime, toTime uint64, frequency string) (map[uint64]*common.VolumeStats, error)
-	GetCountryStats(countryCode string, timezone int64, fromTime, toTime time.Time) (map[string]float64, error)
+	GetCountryStats(countryCode string, timezone int64, fromTime, toTime time.Time) (map[uint64]float64, error)
 }
