@@ -4,12 +4,35 @@ import (
 	"bytes"
 	"strings"
 	"text/template"
+
+	"github.com/influxdata/influxdb/client/v2"
 )
 
 const cqTemplate = `CREATE CONTINUOUS QUERY "{{.Name}}" on "{{.Database}}" ` +
 	`{{if or .ResampleEveryInterval .ResampleForInterval}}RESAMPLE {{if .ResampleEveryInterval}}EVERY {{.ResampleEveryInterval}} {{end}}{{if .ResampleForInterval}}FOR {{.ResampleForInterval}} {{end}}{{end}}` +
 	`BEGIN {{.Query}}` +
 	`{{if not .GroupByQuery}} GROUP BY {{else}}, {{end}}time({{.TimeInterval}}{{if .OffsetInterval}},{{.OffsetInterval}}{{end}}) END`
+
+// NewContinuousQuery creates new ContinuousQuery instance.
+func NewContinuousQuery(
+	name, database, resampleEveryInterval, resampleForInterval, query,
+	timeInterval string, offsetIntervals []string) (*ContinuousQuery, error) {
+	cq := &ContinuousQuery{
+		Name:                  name,
+		Database:              database,
+		ResampleEveryInterval: resampleEveryInterval,
+		ResampleForInterval:   resampleForInterval,
+		Query:                 query,
+		TimeInterval:          timeInterval,
+		OffsetIntervals:       offsetIntervals,
+	}
+	queries, err := cq.prepareQueries()
+	if err != nil {
+		return nil, err
+	}
+	cq.queries = queries
+	return cq, nil
+}
 
 // ContinuousQuery represents an InfluxDB Continuous Query.
 // By design ContinuousQuery doesn't try to be smart, it does not attempt to parse/validate any field,
@@ -69,24 +92,17 @@ func (cq *ContinuousQuery) prepareQueries() ([]string, error) {
 	return queries, nil
 }
 
-// NewContinuousQuery creates new ContinuousQuery instance.
-func NewContinuousQuery(
-	name, database, resampleEveryInterval, resampleForInterval, query,
-	timeInterval string, offsetIntervals []string) (*ContinuousQuery, error) {
-	cq := &ContinuousQuery{
-		Name:                  name,
-		Database:              database,
-		ResampleEveryInterval: resampleEveryInterval,
-		ResampleForInterval:   resampleForInterval,
-		Query:                 query,
-		TimeInterval:          timeInterval,
-		OffsetIntervals:       offsetIntervals,
-	}
-	queries, err := cq.prepareQueries()
-	if err != nil {
-		return nil, err
-	}
-	cq.queries = queries
+// Deploy ensures that all configured cqs are deployed in given InfluxDB server. This method is safe to run multiple
+// times without changes as it will checks if the CQ exists and updated first.
+// TODO: should we move client to constructor?
+func (cq *ContinuousQuery) Deploy(c client.Client) error {
+	// TODO: implement this
+	return nil
+}
 
-	return cq, nil
+// Execute runs all CQs query to aggregate historical data.
+// This method is intended to use once in new deployment.
+func (cq *ContinuousQuery) Execute(c client.Client) error {
+	// TODO: implement this
+	return nil
 }
