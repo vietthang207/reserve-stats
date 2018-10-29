@@ -2,14 +2,13 @@ package http
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
 	"time"
 
 	ethereum "github.com/ethereum/go-ethereum/common"
+	"go.uber.org/zap"
 	"github.com/gin-gonic/gin"
-
 	"github.com/KyberNetwork/reserve-stats/lib/core"
 	_ "github.com/KyberNetwork/reserve-stats/lib/httputil/validators" // import custom validator functions
 	"github.com/KyberNetwork/reserve-stats/lib/timeutil"
@@ -160,6 +159,7 @@ func (sv *Server) setupRouter() *gin.Engine {
 	r.GET("/trade-logs", sv.getTradeLogs)
 	r.GET("/burn-fee", sv.getBurnFee)
 	r.GET("/asset-volume", sv.getAssetVolume)
+	r.GET("/country-stats", sv.getCountryStats)
 	return r
 }
 
