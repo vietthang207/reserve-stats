@@ -27,7 +27,7 @@ func (s *mockStorage) LoadTradeLogs(from, to time.Time) ([]common.TradeLog, erro
 	return nil, nil
 }
 
-func (s *mockStorage) GetAggregatedWalletFee(reserveAddr, walletAddr, freq string, fromTime, toTime time.Time, timezone int64) (map[string]float64, error) {
+func (s *mockStorage) GetAggregatedWalletFee(reserveAddr, walletAddr, freq string, fromTime, toTime time.Time, timezone int64) (map[uint64]float64, error) {
 	return nil, nil
 }
 

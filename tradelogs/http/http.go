@@ -5,11 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/gin-gonic/gin"
-
 	"github.com/KyberNetwork/reserve-stats/tradelogs/storage"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 const limitedTimeRange = 24 * time.Hour
