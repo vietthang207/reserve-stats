@@ -43,6 +43,10 @@ func newReserveCrawlerCli() *cli.App {
 	app.Flags = append(app.Flags, core.NewCliFlags()...)
 	app.Flags = append(app.Flags, influxdb.NewCliFlags()...)
 	app.Action = func(c *cli.Context) error {
+		if err := libapp.Validate(c); err != nil {
+			return err
+		}
+
 		addrs := c.StringSlice(addressesFlag)
 		client, err := libapp.NewEthereumClientFromFlag(c)
 		if err != nil {

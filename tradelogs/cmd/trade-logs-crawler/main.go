@@ -79,6 +79,10 @@ func parseBigIntFlag(c *cli.Context, flag string) (*big.Int, error) {
 }
 
 func getTradeLogs(c *cli.Context) error {
+	if err := libapp.Validate(c); err != nil {
+		return err
+	}
+
 	logger, err := libapp.NewLogger(c)
 	if err != nil {
 		return err
