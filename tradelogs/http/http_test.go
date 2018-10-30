@@ -32,7 +32,6 @@ func (s *mockStorage) GetAggregatedBurnFee(from, to time.Time, freq string, rese
 	return nil, nil
 }
 
-
 func (s *mockStorage) GetCountryStats(countryCode string, timezone int64, fromTime, toTime time.Time) (map[uint64]common.CountryStats, error) {
 	return nil, nil
 }
