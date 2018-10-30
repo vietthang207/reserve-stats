@@ -4,22 +4,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/KyberNetwork/reserve-stats/tradelogs/common"
 	"log"
 	"math/big"
 	"os"
 	"time"
 
+	ethereum "github.com/ethereum/go-ethereum/common"
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/urfave/cli"
 
 	libapp "github.com/KyberNetwork/reserve-stats/lib/app"
 	"github.com/KyberNetwork/reserve-stats/lib/broadcast"
+	"github.com/KyberNetwork/reserve-stats/lib/contracts"
 	"github.com/KyberNetwork/reserve-stats/lib/core"
 	"github.com/KyberNetwork/reserve-stats/lib/influxdb"
 	"github.com/KyberNetwork/reserve-stats/lib/tokenrate"
 	"github.com/KyberNetwork/reserve-stats/tradelogs"
+	"github.com/KyberNetwork/reserve-stats/tradelogs/common"
 	"github.com/KyberNetwork/reserve-stats/tradelogs/storage"
 	"github.com/KyberNetwork/tokenrate/coingecko"
 )
@@ -117,10 +119,18 @@ func getTradeLogs(c *cli.Context) error {
 		return err
 	}
 
+	addresses := []ethereum.Address{
+		contracts.PricingContractAddress().MustGetFromContext(c),
+		contracts.NetworkContractAddress().MustGetFromContext(c),
+		contracts.BurnerContractAddress().MustGetFromContext(c),
+		contracts.InternalNetworkContractAddress().MustGetFromContext(c),
+	}
+
 	crawler, err := tradelogs.NewTradeLogCrawler(
 		sugar,
 		nodeURL,
 		geoClient,
+		addresses,
 	)
 	if err != nil {
 		return err
@@ -152,7 +162,7 @@ func getTradeLogs(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	rates := []tokenrate.ETHUSDRate{}
+	var rates []tokenrate.ETHUSDRate
 	for _, tradelog := range tradeLogs {
 		rate, err := ethUSDRateFetcher.FetchRates(tradelog.BlockNumber, tradelog.Timestamp)
 		if err != nil {

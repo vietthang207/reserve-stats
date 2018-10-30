@@ -15,24 +15,20 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	//InternalReserveAddr is the Kyber's own reserve address
-	InternalReserveAddr = ethereum.HexToAddress("0x63825c174ab367968EC60f061753D3bbD36A0D8F")
-)
-
 // ResreveRatesCrawler contains two wrapper contracts for V1 and V2 contract,
 // a set of addresses to crawl rates from and setting object to query for reserve's token settings
 type ResreveRatesCrawler struct {
-	wrapperContract reserveRateGetter
-	Addresses       []ethereum.Address
-	tokenSetting    tokenSetting
-	sugar           *zap.SugaredLogger
-	blkTimeRsv      blockchain.BlockTimeResolverInterface
-	db              storage.ReserveRatesStorage
+	wrapperContract     reserveRateGetter
+	Addresses           []ethereum.Address
+	tokenSetting        tokenSetting
+	internalReserveAddr ethereum.Address
+	sugar               *zap.SugaredLogger
+	blkTimeRsv          blockchain.BlockTimeResolverInterface
+	db                  storage.ReserveRatesStorage
 }
 
 // NewReserveRatesCrawler returns an instant of ReserveRatesCrawler.
-func NewReserveRatesCrawler(addrs []string, client *ethclient.Client, sett tokenSetting, sugar *zap.SugaredLogger, bl blockchain.BlockTimeResolverInterface, dbInstance storage.ReserveRatesStorage) (*ResreveRatesCrawler, error) {
+func NewReserveRatesCrawler(addrs []string, client *ethclient.Client, sett tokenSetting, internalReserveAddr ethereum.Address, sugar *zap.SugaredLogger, bl blockchain.BlockTimeResolverInterface, dbInstance storage.ReserveRatesStorage) (*ResreveRatesCrawler, error) {
 	wrpContract, err := contracts.NewVersionedWrapper(client)
 	if err != nil {
 		return nil, err
@@ -42,17 +38,18 @@ func NewReserveRatesCrawler(addrs []string, client *ethclient.Client, sett token
 		ethAddrs = append(ethAddrs, ethereum.HexToAddress(addr))
 	}
 	return &ResreveRatesCrawler{
-		wrapperContract: wrpContract,
-		Addresses:       ethAddrs,
-		tokenSetting:    sett,
-		sugar:           sugar,
-		blkTimeRsv:      bl,
-		db:              dbInstance,
+		wrapperContract:     wrpContract,
+		Addresses:           ethAddrs,
+		tokenSetting:        sett,
+		internalReserveAddr: internalReserveAddr,
+		sugar:               sugar,
+		blkTimeRsv:          bl,
+		db:                  dbInstance,
 	}, nil
 }
 
 func (rrc *ResreveRatesCrawler) callTokens(rsvAddr ethereum.Address) ([]core.Token, error) {
-	if rsvAddr.Hex() == InternalReserveAddr.Hex() {
+	if rsvAddr.Hex() == rrc.internalReserveAddr.Hex() {
 		return rrc.tokenSetting.GetInternalTokens()
 	}
 	return rrc.tokenSetting.GetActiveTokens()

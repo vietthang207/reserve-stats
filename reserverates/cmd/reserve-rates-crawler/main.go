@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/KyberNetwork/reserve-stats/lib/contracts"
 	"log"
 	"os"
 
@@ -74,7 +75,10 @@ func newReserveCrawlerCli() *cli.App {
 		if err != nil {
 			return err
 		}
-		reserveRateCrawler, err := crawler.NewReserveRatesCrawler(addrs, client, coreClient, logger.Sugar(), blockTimeResolver, rateStorage)
+
+		internalReserveAddr := contracts.InternalReserveAddress().MustGetFromContext(c)
+
+		reserveRateCrawler, err := crawler.NewReserveRatesCrawler(addrs, client, coreClient, internalReserveAddr, logger.Sugar(), blockTimeResolver, rateStorage)
 		if err != nil {
 			return err
 		}
